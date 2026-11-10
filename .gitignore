@@ -1,0 +1,11 @@
+**/target/
+**/data/
+frontend/node_modules/
+frontend/dist/
+.env
+*.log
+.zed/
+.m2-cache/
+frontend/.npm-cache/
+.smoke/
+frontend/*.tsbuildinfo
