@@ -478,7 +478,7 @@ Estas funcionalidades forman parte de la planificación y no deben considerarse 
 
 ## Contexto académico
 
-Kamel Store se desarrolla como un proyecto académico de la asignatura **Sistemas Distribuidos**, orientado al estudio de arquitecturas de integración empresarial.
+Kamel Store se desarrolla como un proyecto académico de la asignatura **Arquitectura de Sistemas II**, orientado al estudio de arquitecturas de integración empresarial.
 
 Su propósito es demostrar cómo un Enterprise Service Bus puede facilitar la comunicación entre aplicaciones independientes mediante el intercambio de mensajes, el enrutamiento de solicitudes, la transformación de datos y la coordinación de procesos.
 
