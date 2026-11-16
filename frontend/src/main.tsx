@@ -1,9 +1,9 @@
 import React,{useEffect,useState} from 'react';
 import{createRoot}from'react-dom/client';
 import{ArrowRight,ArrowUpRight,Box,CheckCircle2,ChevronRight,FileText,Menu,Package,RefreshCw,ShoppingBag,Truck,AlertCircle}from'lucide-react';
-import{api}from'./api';import type{Product,Order}from'./types';import'./style.css';
+import{api}from'./api';import type{Product,Order}from'./types';import'./style.css';import'./logo.css';
 const money=(n:number)=>new Intl.NumberFormat('es-CO',{style:'currency',currency:'COP',maximumFractionDigits:0}).format(n);
-function Logo(){return <a className="brand" href="#inicio"><span className="brand-icon" aria-hidden="true"/><span>Kamel<br/><em>Store</em></span></a>}
+function Logo(){return <a className="brand" href="#inicio" aria-label="Kamel Store"><img className="brand-logo" src="/logo-kamel.png" alt="Kamel Store"/></a>}
 function App(){const[page,setPage]=useState<'inicio'|'catalogo'|'pedidos'>('inicio');const[products,setProducts]=useState<Product[]>([]);const[orders,setOrders]=useState<Order[]>([]);const[selected,setSelected]=useState<Product|null>(null);const[quantity,setQuantity]=useState(1);const[busy,setBusy]=useState(false);const[error,setError]=useState('');const[last,setLast]=useState<Order|null>(null);const[menu,setMenu]=useState(false);
  const refresh=async()=>{try{const[p,o]=await Promise.all([api.products(),api.orders()]);setProducts(p);setOrders(o);setError('')}catch(e){setError((e as Error).message)}};
  useEffect(()=>{refresh()},[]);const navigate=(p:typeof page)=>{setPage(p);setMenu(false);window.scrollTo({top:0,behavior:'smooth'})};

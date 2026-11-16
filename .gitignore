@@ -9,3 +9,7 @@ frontend/dist/
 frontend/.npm-cache/
 .smoke/
 frontend/*.tsbuildinfo
+.kamel/
+
+# Imagenes Docker exportadas
+*.tar

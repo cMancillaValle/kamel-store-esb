@@ -1,0 +1,134 @@
+name: kamel-store
+
+services:
+  inventario:
+    image: kamel-store-inventario:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SERVICE: inventario-service
+    environment:
+      PORT: 8083
+      DB_URL: "jdbc:h2:file:/data/inventario;DB_CLOSE_ON_EXIT=FALSE"
+    ports:
+      - "8083:8083"
+    volumes:
+      - inventario-data:/data
+    networks:
+      - kamel-network
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c '</dev/tcp/127.0.0.1/8083'"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 20s
+
+  facturacion:
+    image: kamel-store-facturacion:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SERVICE: facturacion-service
+    environment:
+      PORT: 8084
+      DB_URL: "jdbc:h2:file:/data/facturacion;DB_CLOSE_ON_EXIT=FALSE"
+    ports:
+      - "8084:8084"
+    volumes:
+      - facturacion-data:/data
+    networks:
+      - kamel-network
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c '</dev/tcp/127.0.0.1/8084'"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 20s
+
+  esb:
+    image: kamel-store-esb:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SERVICE: esb-service
+    environment:
+      PORT: 8082
+      INVENTARIO_URL: http://inventario:8083
+      FACTURACION_URL: http://facturacion:8084
+      HTTP_CONNECT_TIMEOUT_MS: 2000
+      HTTP_RESPONSE_TIMEOUT_MS: 5000
+    ports:
+      - "8082:8082"
+    depends_on:
+      inventario:
+        condition: service_healthy
+      facturacion:
+        condition: service_healthy
+    networks:
+      - kamel-network
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c '</dev/tcp/127.0.0.1/8082'"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 20s
+
+  ventas:
+    image: kamel-store-ventas:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SERVICE: ventas-service
+    environment:
+      PORT: 8081
+      ESB_URL: http://esb:8082
+      DB_URL: "jdbc:h2:file:/data/ventas;DB_CLOSE_ON_EXIT=FALSE"
+      HTTP_CONNECT_TIMEOUT_MS: 2000
+      HTTP_REQUEST_TIMEOUT_MS: 5000
+    ports:
+      - "8081:8081"
+    volumes:
+      - ventas-data:/data
+    depends_on:
+      esb:
+        condition: service_healthy
+    networks:
+      - kamel-network
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c '</dev/tcp/127.0.0.1/8081'"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 20s
+
+  frontend:
+    image: kamel-store-frontend:latest
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5173:80"
+    depends_on:
+      ventas:
+        condition: service_healthy
+    networks:
+      - kamel-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O - http://127.0.0.1/ >/dev/null 2>&1"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 5s
+
+networks:
+  kamel-network:
+    driver: bridge
+
+volumes:
+  ventas-data:
+  inventario-data:
+  facturacion-data:
